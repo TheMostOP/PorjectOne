@@ -43,7 +43,7 @@
         //if the response is successful, display users
         if (response.status == 200) {
           //To display the data easily, we will just stringify it again and display it.
-          let jsonString = JSON.stringify(obj.users);
+          let jsonString = JSON.stringify(obj.votes);
           content.innerHTML += `<p>${jsonString}</p>`;
         }
         //otherwise, display the error message
@@ -59,23 +59,22 @@
 
     //Uses fetch to send a postRequest. Marksed as async because we use await
     //within it.
-    const sendPost = async (nameForm) => {
+    const sendPost = async (voteForm) => {
       //Grab all the info from the form
-      const nameAction = nameForm.getAttribute('action');
-      const nameMethod = nameForm.getAttribute('method');
+      const voteAction = voteForm.getAttribute('action');
+      const voteMethod = voteForm.getAttribute('method');
 
       const nameField = nameForm.querySelector('#nameField');
-      const ageField = nameForm.querySelector('#ageField');
 
       //Build a data string in the FORM-URLENCODED format.
-      const formData = `name=${nameField.value}&age=${ageField.value}`;
+      const formData = `name=${nameField.value}`;
 
       //Make a fetch request and await a response. Set the method to
       //the one provided by the form (POST). Set the headers. Content-Type
       //is the type of data we are sending. Accept is the data we would like
       //in response. Then add our FORM-URLENCODED string as the body of the request.
-      let response = await fetch(nameAction, {
-        method: nameMethod,
+      let response = await fetch(voteAction, {
+        method: voteMethod,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json',
@@ -111,32 +110,33 @@
 
     //Init function is called when window.onload runs (set below).
     const init = () => {
-      //Grab the name form
-      const nameForm = document.querySelector('#nameForm');
-
-      //Create an addUser function that cancels the forms default action and
-      //calls our sendPost function above.
-      const addUser = (e) => {
-        e.preventDefault();
-        sendPost(nameForm);
-        return false;
-      }
-
-      //Call addUser when the submit event fires on the form.
-      nameForm.addEventListener('submit', addUser);
-
       //grab user form
       const userForm = document.querySelector('#userForm');
 
       //function to handle our request. In this case, it also cancels the built in html form action
-      const getUsers = (e) => {
+      const getVotes = (e) => {
         e.preventDefault();
         requestUpdate(userForm);
         return false;
       }
-
+      
       //add event listener
-      userForm.addEventListener('submit', getUsers);
+      userForm.addEventListener('submit', getVotes);
+
+      //Grab the vote form
+      const voteForm = document.querySelector('#voteForm');
+
+      //Create an addVote function that cancels the forms default action and
+      //calls our sendPost function above.
+      const addVote = (e) => {
+        e.preventDefault();
+        sendPost(voteForm);
+        return false;
+      }
+
+      //Call addVote when the submit event fires on the form.
+      voteForm.addEventListener('submit', addVote);
+
     };
 
     //When the window loads, run init.
@@ -154,16 +154,20 @@
       <input id="ageField" type="number" name="age" min="0" max="100" step="1" />
       <input type="submit" value="Add User" />
     </form>
-    <form id="userForm" action="/getUsers" method="get">
+    <form id="userForm" action="/getVotes" method="get">
       <select id='urlField'>
-        <option value='/getUsers'>/getUsers</option>
-        <option value='/notReal'>/notReal</option>
+        <option value='/getVotes'>/getVotes</option>
       </select>
       <select id="methodSelect">
         <option value="get">GET</option>
         <option value="head">HEAD</option>
       </select>
       <input type="submit" value="Get User" />
+    </form>
+    <form id="voteForm" action="/addVote" method="post">
+      <label for="name">Name: </label>
+      <input id="nameField" type="text" name="name" />
+      <input type="submit" value="Add Vote" />
     </form>
   </section>
   <section id="content">

@@ -52,10 +52,12 @@ const urlStruct = {
     '/': htmlHandler.getIndex,
     '/style.css': htmlHandler.getStyle,
     '/getUsers': jsonHandler.getUsers,
+    '/getVotes': jsonHandler.getVotes,
     notFound: jsonHandler.notFound,
   },
   HEAD: {
     '/getUsers': jsonHandler.getUsersMeta,
+    '/getVotes': jsonHandler.getVotesMeta,
     notFound: jsonHandler.notFound,
   },
 };

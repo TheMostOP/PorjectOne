@@ -1,4 +1,5 @@
 const users = {};
+const votes = {};
 
 // function to respond with a json object
 // takes request, response, status code and object to send
@@ -28,6 +29,20 @@ const getUsers = (request, response) => {
 // should calculate a 200
 // return 200 without message, just the meta data
 const getUsersMeta = (request, response) => respondJSONMeta(request, response, 200);
+
+// return user object as JSON
+const getVotes = (request, response) => {
+  const responseJSON = {
+    votes,
+  };
+
+  respondJSON(request, response, 200, responseJSON);
+};
+
+// get meta info about user object
+// should calculate a 200
+// return 200 without message, just the meta data
+const getVotesMeta = (request, response) => respondJSONMeta(request, response, 200);
 
 // function to add a user from a POST body
 const addUser = (request, response, body) => {
@@ -78,10 +93,49 @@ const notFound = (request, response) => {
   respondJSON(request, response, 404, responseJSON);
 };
 
+// function to add a user from a POST body
+const addVote = (request, response, body) => {
+  // default json message
+  const responseJSON = {
+    message: 'Required to specify what you are voting for.',
+  };
+
+  // check to make sure we have the field
+  // If it's missing, send back an error message as a 400 badRequest
+  if (!body.name) {
+    responseJSON.id = 'addVotemissingParams';
+    return respondJSON(request, response, 400, responseJSON);
+  }
+
+  // default status code to 204 updated
+  let responseCode = 204;
+
+  // If the choice voted for doesn't exist yet
+  if (!votes[body.name]) {
+    // Set the status code to 201 (created) and create an empty vote
+    responseCode = 201;
+    votes[body.name] = {};
+  }
+
+  // add or update field for this vote
+  votes[body.name].name = body.name;
+
+  // if response is created, then set our created message
+  // and send response with a message
+  if (responseCode === 201) {
+    responseJSON.message = 'Vote Created and Cast Successfully';
+    return respondJSON(request, response, responseCode, responseJSON);
+  }
+  return respondJSONMeta(request, response, responseCode);
+};
+
 // public exports
 module.exports = {
   getUsers,
   getUsersMeta,
   addUser,
+  getVotes,
+  getVotesMeta,
+  addVote,
   notFound,
 };
