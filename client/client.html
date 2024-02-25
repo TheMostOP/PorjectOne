@@ -59,15 +59,15 @@
 
     //Uses fetch to send a postRequest. Marksed as async because we use await
     //within it.
-    const sendPost = async (voteForm) => {
+    const sendPost = async (voteForm, choiceMade) => {
       //Grab all the info from the form
       const voteAction = voteForm.getAttribute('action');
       const voteMethod = voteForm.getAttribute('method');
 
-      const nameField = voteForm.querySelector('#nameField');
+      const nameField = choiceMade;
 
       //Build a data string in the FORM-URLENCODED format.
-      const formData = `name=${nameField.value}`;
+      const formData = `name=${nameField}`;
 
       //Make a fetch request and await a response. Set the method to
       //the one provided by the form (POST). Set the headers. Content-Type
@@ -130,7 +130,7 @@
       //calls our sendPost function above.
       const addVote = (e) => {
         e.preventDefault();
-        sendPost(voteForm);
+        sendPost(voteForm, e.submitter.value);
         return false;
       }
 
@@ -148,9 +148,8 @@
   <section id="top">
     <h3>POST Status Code Tests</h3>
     <form id="voteForm" action="/addVote" method="post">
-      <label for="name">Name: </label>
-      <input id="nameField" type="text" name="name" />
-      <input type="submit" value="Add Vote" />
+      <input type="submit" value="Right Choice" />
+      <input type="submit" value="Left Choice" />
     </form>
     <form id="getVotesForm" action="/getVotes" method="get">
       <select id='urlField'>

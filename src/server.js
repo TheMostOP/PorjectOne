@@ -49,7 +49,7 @@ const handlePost = (request, response, parsedUrl) => {
   if (parsedUrl.pathname === '/addVote') {
     // Call our parseBody handler, and pass in the
     // jsonHandler.addVote function as the handler callback function.
-    parseBody(request, response, jsonHandler.addVote); 
+    parseBody(request, response, jsonHandler.addVote);
   }
 };
 
