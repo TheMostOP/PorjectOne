@@ -112,13 +112,15 @@ const addVote = (request, response, body) => {
 
   // If the choice voted for doesn't exist yet
   if (!votes[body.name]) {
-    // Set the status code to 201 (created) and create an empty vote
+    // Set the status code to 201 (created) and create a vote with zero points
     responseCode = 201;
     votes[body.name] = {};
+    votes[body.name].points = 0;
   }
 
-  // add or update field for this vote
+  // add or update fields for this vote
   votes[body.name].name = body.name;
+  votes[body.name].points++;
 
   // if response is created, then set our created message
   // and send response with a message
