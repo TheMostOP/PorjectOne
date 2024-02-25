@@ -64,7 +64,7 @@
       const voteAction = voteForm.getAttribute('action');
       const voteMethod = voteForm.getAttribute('method');
 
-      const nameField = nameForm.querySelector('#nameField');
+      const nameField = voteForm.querySelector('#nameField');
 
       //Build a data string in the FORM-URLENCODED format.
       const formData = `name=${nameField.value}`;
@@ -88,11 +88,11 @@
     };
 
     //function to send request. This is marked as async since we will use await.
-    const requestUpdate = async (userForm) => {
+    const requestUpdate = async (getVotesForm) => {
 
       //Grab the url and method from the html form below
-      const url = userForm.querySelector('#urlField').value;
-      const method = userForm.querySelector('#methodSelect').value;
+      const url = getVotesForm.querySelector('#urlField').value;
+      const method = getVotesForm.querySelector('#methodSelect').value;
 
       //Await our fetch response. Go to the URL, use the right method, and attach the headers.
       let response = await fetch(url, {
@@ -111,17 +111,17 @@
     //Init function is called when window.onload runs (set below).
     const init = () => {
       //grab user form
-      const userForm = document.querySelector('#userForm');
+      const getVotesForm = document.querySelector('#getVotesForm');
 
       //function to handle our request. In this case, it also cancels the built in html form action
       const getVotes = (e) => {
         e.preventDefault();
-        requestUpdate(userForm);
+        requestUpdate(getVotesForm);
         return false;
       }
       
       //add event listener
-      userForm.addEventListener('submit', getVotes);
+      getVotesForm.addEventListener('submit', getVotes);
 
       //Grab the vote form
       const voteForm = document.querySelector('#voteForm');
@@ -147,14 +147,12 @@
 <body>
   <section id="top">
     <h3>POST Status Code Tests</h3>
-    <form id="nameForm" action="/addUser" method="post">
+    <form id="voteForm" action="/addVote" method="post">
       <label for="name">Name: </label>
       <input id="nameField" type="text" name="name" />
-      <label for="age">Age: </label>
-      <input id="ageField" type="number" name="age" min="0" max="100" step="1" />
-      <input type="submit" value="Add User" />
+      <input type="submit" value="Add Vote" />
     </form>
-    <form id="userForm" action="/getVotes" method="get">
+    <form id="getVotesForm" action="/getVotes" method="get">
       <select id='urlField'>
         <option value='/getVotes'>/getVotes</option>
       </select>
@@ -162,12 +160,7 @@
         <option value="get">GET</option>
         <option value="head">HEAD</option>
       </select>
-      <input type="submit" value="Get User" />
-    </form>
-    <form id="voteForm" action="/addVote" method="post">
-      <label for="name">Name: </label>
-      <input id="nameField" type="text" name="name" />
-      <input type="submit" value="Add Vote" />
+      <input type="submit" value="Get Votes" />
     </form>
   </section>
   <section id="content">

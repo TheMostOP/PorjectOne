@@ -45,6 +45,12 @@ const handlePost = (request, response, parsedUrl) => {
     // jsonHandler.addUser function as the handler callback function.
     parseBody(request, response, jsonHandler.addUser);
   }
+  // If they go to /addVote
+  if (parsedUrl.pathname === '/addVote') {
+    // Call our parseBody handler, and pass in the
+    // jsonHandler.addVote function as the handler callback function.
+    parseBody(request, response, jsonHandler.addVote); 
+  }
 };
 
 const urlStruct = {
