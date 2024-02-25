@@ -2,10 +2,88 @@
 <html lang="en">
 
 <head>
-  <title>Our simple HTTP server</title>
+  <title>Who Is the Best Pokemon</title>
   <link rel="stylesheet" type="text/css" href="/style.css">
 
   <script>
+    //communcate with external poke-api
+    //some code here is based on my 235 project "Amiibo Shelf" https://people.rit.edu/lcs3087/235/project2/index.html
+    //some code here is based on my 430 assignment HTTP API Assignment 2 https://luke-sullivan-http-api-2-9aad542a9f75.herokuapp.com/
+    function getData() {
+      // 1 - main entry point to web service
+      const SERVICE_URL = "https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0";
+
+      // No API Key required!
+
+      // 2 - build up our URL string
+      // not necessary for this service endpoint
+      let url = SERVICE_URL;
+
+      // 3 - parse the user entered term we wish to search
+      // not necessary for this service endpoint
+      // let term = document.querySelector("#searchterm").value.trim();
+      // term = encodeURIComponent(term);
+      // let type = document.querySelector("#searchType").value;
+      // url += type;
+      // url += "=";
+      // url += term;
+
+      // 4 - update the UI
+      document.querySelector("#content").innerHTML = `<b>Querying web service with:</b> <a href="${url}" target="_blank">${url}</a>`;
+
+      // 5 - create a new XHR object
+      let xhr = new XMLHttpRequest();
+
+
+      // 6 - set the onload handler
+      xhr.onload = dataLoaded;
+
+      // 7 - set the onerror handler
+      xhr.onerror = dataError;
+
+      // 8 - open connection and send the request
+      xhr.open("GET", url);
+      xhr.send();
+    }
+
+    function dataError(e) {
+      console.log("An error occurred");
+    }
+
+    function dataLoaded(e) {
+      // 1 - e.target is the xhr object
+      let xhr = e.target;
+
+      // 2 - xhr.responseText is the JSON file we just downloaded
+      console.log(xhr.responseText);
+
+      // 3 - turn the text into a parsable JavaScript object
+      let obj = JSON.parse(xhr.responseText);
+      console.log(obj.results);
+
+      //if there are no results, print a message and return
+      if (!obj.results || obj.results.length == 0) {
+        document.querySelector("#content").innerHTML = "<b>No results found</b>";
+        //document.querySelector("#content").innerHTML = "";
+        return; //Bail out
+      }
+
+      // 4 - if there is an array of results, loop through them
+      results = obj.results;
+      //let bigString = "";
+      document.querySelector("#content").innerHTML = "<p><i>Here are the results!</i></p>";
+      //randomly choose two pokemon
+      let rightChoice = Math.floor(Math.random() * results.length);
+      let leftChoice = Math.floor(Math.random() * results.length);
+
+      console.log(results[121]);
+      document.querySelector('#rightChoice').value = results[rightChoice].name;
+      document.querySelector('#leftChoice').value = results[leftChoice].name;
+
+      // 5 - display final results to user
+      //document.querySelector("#content").innerHTML = bigString;
+    }
+
     //Handles our FETCH response.
     const handleResponse = async (response, parseResponse) => {
 
@@ -110,11 +188,7 @@
 
     const randomizeChoices = () => {
       //randomly generate two numbers to be the two choices to vote for
-      let rightChoice = Math.floor(Math.random() * 10);
-      let leftChoice = Math.floor(Math.random() * 10);
-
-      document.querySelector('#rightChoice').value = rightChoice;
-      document.querySelector('#leftChoice').value = leftChoice;
+      getData();
     }
 
     //Init function is called when window.onload runs (set below).
