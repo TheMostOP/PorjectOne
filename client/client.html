@@ -116,13 +116,17 @@
       if (parseResponse) {
         //Parse the response to json. This is an async function, so we will await it.
         let obj = await response.json();
-        console.log(obj);
+        console.log(obj.votes.length);
 
         //if the response is successful, display users
         if (response.status == 200) {
-          //To display the data easily, we will just stringify it again and display it.
-          let jsonString = JSON.stringify(obj.votes);
-          content.innerHTML += `<p>${jsonString}</p>`;
+          //To display the data, we will loop through the votes and display them.
+          for (const pokemon in obj.votes) {
+            if (Object.hasOwnProperty.call(obj.votes, pokemon)) {
+              const element = obj.votes[pokemon];
+              content.innerHTML += `<p>${element.name}: ${element.points} votes</p>`;
+            }
+          }
         }
         //otherwise, display the error message
         else {
