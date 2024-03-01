@@ -9,9 +9,9 @@
     //communcate with external poke-api
     //some code here is based on my 235 project "Amiibo Shelf" https://people.rit.edu/lcs3087/235/project2/index.html
     //some code here is based on my 430 assignment HTTP API Assignment 2 https://luke-sullivan-http-api-2-9aad542a9f75.herokuapp.com/
-    function getData() {
+    function getData(serviceUrl, isImageRequest) {
       // 1 - main entry point to web service
-      const SERVICE_URL = "https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0";
+      const SERVICE_URL = serviceUrl;
 
       // No API Key required!
 
@@ -36,7 +36,12 @@
 
 
       // 6 - set the onload handler
-      xhr.onload = dataLoaded;
+      if (isImageRequest) {
+        xhr.onload = dataLoadedImage;
+      }
+      else {
+        xhr.onload = dataLoaded;
+      }
 
       // 7 - set the onerror handler
       xhr.onerror = dataError;
@@ -76,9 +81,41 @@
       let rightChoice = Math.floor(Math.random() * results.length);
       let leftChoice = Math.floor(Math.random() * results.length);
 
+      //get the images
+      getData("https://pokeapi.co/api/v2/pokemon/ditto", true);
+
       console.log(results[121]);
       document.querySelector('#rightChoice').value = results[rightChoice].name;
       document.querySelector('#leftChoice').value = results[leftChoice].name;
+
+      // 5 - display final results to user
+      //document.querySelector("#content").innerHTML = bigString;
+    }
+
+    function dataLoadedImage(e) {
+      // 1 - e.target is the xhr object
+      let xhr = e.target;
+
+      // 2 - xhr.responseText is the JSON file we just downloaded
+      console.log(xhr.responseText);
+
+      // 3 - turn the text into a parsable JavaScript object
+      let obj = JSON.parse(xhr.responseText);
+      console.log("obj: ");
+      console.log(obj);
+      //if there are no results, print a message and return
+      if (!obj) {
+        document.querySelector("#content").innerHTML = "<b>No results found (Image)</b>";
+        //document.querySelector("#content").innerHTML = "";
+        return; //Bail out
+      }
+
+      // 4 - if there is an array of results, loop through them
+      results = obj;
+      //let bigString = "";
+      document.querySelector("#content").innerHTML = "<p><i>Here are the results!</i></p>";
+      console.log("results");
+      console.log(results);
 
       // 5 - display final results to user
       //document.querySelector("#content").innerHTML = bigString;
@@ -117,16 +154,15 @@
         //Parse the response to json. This is an async function, so we will await it.
         let obj = await response.json();
 
-        //sort the returned data into an array
-        let objArray = Object.values(obj.votes);
-        objArray.sort((a,b) => {return b.points-a.points});
-
         //if the response is successful, display users
         if (response.status == 200) {
           //To display the data, we will loop through the votes and display them.
-          objArray.forEach(pokemon => {
-            content.innerHTML += `<p>${pokemon.name}: ${pokemon.points} votes</p>`;
-          });
+          for (const pokemon in obj.votes) {
+            if (Object.hasOwnProperty.call(obj.votes, pokemon)) {
+              const element = obj.votes[pokemon];
+              content.innerHTML += `<p>${element.name}: ${element.points} votes</p>`;
+            }
+          }
         }
         //otherwise, display the error message
         else {
@@ -165,8 +201,8 @@
       });
 
       //Once we have a response, handle it. The second parameter is a boolean
-      //that says we should not parse the response.
-      handleResponse(response, false);
+      //that says we should parse the response.
+      handleResponse(response, true);
     };
 
     //function to send request. This is marked as async since we will use await.
@@ -192,7 +228,7 @@
 
     const randomizeChoices = () => {
       //randomly generate two numbers to be the two choices to vote for
-      getData();
+      getData("https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0", false);
     }
 
     //Init function is called when window.onload runs (set below).
