@@ -19,3 +19,27 @@ html, body {
   font-size: 2em;
   text-align: center;
 }
+
+#gridContainer {
+  padding: 5%;
+  display: grid;
+  justify-content: center;
+}
+
+#rightImage, #leftImage {
+  max-height: 5rem;
+  max-width: 5rem;
+  grid-row-start: 1;
+}
+
+#rightImage, #rightChoice {
+  grid-column-start: 1;
+}
+
+#leftImage, #leftChoice {
+  grid-column-start: 2;
+}
+
+#rightChoice, #leftChoice {
+  margin: 10%;
+}
