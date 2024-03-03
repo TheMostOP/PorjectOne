@@ -59,12 +59,12 @@
       // 1 - e.target is the xhr object
       let xhr = e.target;
 
-      // 2 - xhr.responseText is the JSON file we just downloaded
-      console.log(xhr.responseText);
+      //xhr.responseText is the JSON file we just downloaded
+      // console.log("xhr.responseText");
+      // console.log(xhr.responseText);
 
       // 3 - turn the text into a parsable JavaScript object
       let obj = JSON.parse(xhr.responseText);
-      console.log(obj.results);
 
       //if there are no results, print a message and return
       if (!obj.results || obj.results.length == 0) {
@@ -82,9 +82,8 @@
       let leftChoice = Math.floor(Math.random() * results.length);
 
       //get the images
-      getData("https://pokeapi.co/api/v2/pokemon/ditto", true);
+      getData(`https://pokeapi.co/api/v2/pokemon/${results[rightChoice].name}`, true);
 
-      console.log(results[121]);
       document.querySelector('#rightChoice').value = results[rightChoice].name;
       document.querySelector('#leftChoice').value = results[leftChoice].name;
 
@@ -96,8 +95,9 @@
       // 1 - e.target is the xhr object
       let xhr = e.target;
 
-      // 2 - xhr.responseText is the JSON file we just downloaded
-      console.log(xhr.responseText);
+      //xhr.responseText is the JSON file we just downloaded
+      // console.log("xhr.responseText");
+      // console.log(xhr.responseText);
 
       // 3 - turn the text into a parsable JavaScript object
       let obj = JSON.parse(xhr.responseText);
@@ -110,15 +110,13 @@
         return; //Bail out
       }
 
-      // 4 - if there is an array of results, loop through them
+      // get the image and insert it into the html
       results = obj;
-      //let bigString = "";
       document.querySelector("#content").innerHTML = "<p><i>Here are the results!</i></p>";
       console.log("results");
       console.log(results);
-
-      // 5 - display final results to user
-      //document.querySelector("#content").innerHTML = bigString;
+      console.log("results.abilities[0].ability.name");
+      console.log(results.abilities[0].ability.name);
     }
 
     //Handles our FETCH response.
