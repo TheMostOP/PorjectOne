@@ -80,8 +80,29 @@
       getData(`https://pokeapi.co/api/v2/pokemon/${results[leftChoice].name}`, true, false);
 
       //put the names in the buttons
-      document.querySelector('#rightChoice').value = results[rightChoice].name;
-      document.querySelector('#leftChoice').value = results[leftChoice].name;
+      document.querySelector('#rightChoice').value = formatNames(results[rightChoice].name);
+      document.querySelector('#leftChoice').value = formatNames(results[leftChoice].name);
+    }
+
+    //make the names look nicer
+    function formatNames(name) {      
+      //remove dashes
+      name = name.replaceAll("-", " ");
+
+      //capitalize the first letter of every word
+      console.log(name.split(" "));
+      let nameArray = name.split(" ");
+      name = "";
+      for(let i = 0; i < nameArray.length; i++) {
+        console.log(nameArray[i]);
+        nameArray[i] = nameArray[i][0].toUpperCase() + nameArray[i].slice(1);
+        name = name + " " + nameArray[i];
+      }
+      console.log(nameArray);
+
+      name = name[0].toUpperCase() + name.slice(1);
+
+      return name;
     }
 
     function dataLoadedImage(e) {

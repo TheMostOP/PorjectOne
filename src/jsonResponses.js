@@ -1,4 +1,3 @@
-
 //some code here is based on my 430 assignment HTTP API Assignment 2 https://luke-sullivan-http-api-2-9aad542a9f75.herokuapp.com/
 const users = {};
 const votes = {};

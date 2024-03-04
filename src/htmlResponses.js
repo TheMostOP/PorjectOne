@@ -1,4 +1,3 @@
-
 //some code here is based on my 430 assignment HTTP API Assignment 2 https://luke-sullivan-http-api-2-9aad542a9f75.herokuapp.com/
 const fs = require('fs'); // pull in the file system module
 
@@ -15,6 +14,6 @@ const getStyle = (request, response) => {
   response.writeHead(200, { 'Content-Type': 'text/css' });
   response.write(style);
   response.end();
-};
+}; 
 
 module.exports = { getIndex, getStyle };
