@@ -40,12 +40,6 @@ const parseBody = (request, response, handler) => {
 
 // handle POST requests
 const handlePost = (request, response, parsedUrl) => {
-  // If they go to /addUser
-  if (parsedUrl.pathname === '/addUser') {
-    // Call our parseBody handler, and pass in the
-    // jsonHandler.addUser function as the handler callback function.
-    parseBody(request, response, jsonHandler.addUser);
-  }
   // If they go to /addVote
   if (parsedUrl.pathname === '/addVote') {
     // Call our parseBody handler, and pass in the
@@ -58,12 +52,11 @@ const urlStruct = {
   GET: {
     '/': htmlHandler.getIndex,
     '/style.css': htmlHandler.getStyle,
-    '/getUsers': jsonHandler.getUsers,
     '/getVotes': jsonHandler.getVotes,
+    '/getPokemon': jsonHandler.getPokemon,
     notFound: jsonHandler.notFound,
   },
   HEAD: {
-    '/getUsers': jsonHandler.getUsersMeta,
     '/getVotes': jsonHandler.getVotesMeta,
     notFound: jsonHandler.notFound,
   },

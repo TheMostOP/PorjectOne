@@ -6,133 +6,7 @@
   <link rel="stylesheet" type="text/css" href="/style.css">
 
   <script>
-    //communcate with external poke-api
-    //some code here is based on my 235 project "Amiibo Shelf" https://people.rit.edu/lcs3087/235/project2/index.html
     //some code here is based on my 430 assignment HTTP API Assignment 2 https://luke-sullivan-http-api-2-9aad542a9f75.herokuapp.com/
-    function getData(serviceUrl, isImageRequest = false, isRightImage = false) {
-      // main entry point to web service
-      const SERVICE_URL = serviceUrl;
-
-      // No API Key required!
-
-      // build up our URL string
-      // not necessary for this service endpoint
-      let url = SERVICE_URL;
-
-      // create a new XHR object
-      let xhr = new XMLHttpRequest();
-
-
-      // set the onload handler
-      if (isImageRequest) {
-        if (isRightImage) {
-          xhr.onload = dataLoadedRightImage;
-        }
-        else { //isLeftImage
-          xhr.onload = dataLoadedLeftImage;
-        }
-      }
-      else {
-        xhr.onload = dataLoadedNames;
-      }
-
-      // set the onerror handler
-      xhr.onerror = dataError;
-
-      // open connection and send the request
-      xhr.open("GET", url);
-      xhr.send();
-    }
-
-    function dataError(e) {
-      console.log("An error occurred");
-    }
-
-    function dataLoaded(e) {
-      //e.target is the xhr object
-      let xhr = e.target;
-
-      //xhr.responseText is the JSON file we just downloaded
-
-      //turn the text into a parsable JavaScript object
-      let obj = JSON.parse(xhr.responseText);
-
-      return obj;
-    }
-
-    function dataLoadedNames(e) {
-      let obj = dataLoaded(e);
-
-      //if there are no results, print a message and return
-      if (!obj.results || obj.results.length == 0) {
-        console.log("No results found");
-        return; //Bail out
-      }
-
-      results = obj.results;
-      console.log("Here are the results!");
-      //randomly choose two pokemon
-      let rightChoice = Math.floor(Math.random() * results.length);
-      let leftChoice = Math.floor(Math.random() * results.length);
-
-      //get the images
-      getData(`https://pokeapi.co/api/v2/pokemon/${results[rightChoice].name}`, true, true);
-      getData(`https://pokeapi.co/api/v2/pokemon/${results[leftChoice].name}`, true, false);
-
-      //put the names in the buttons
-      document.querySelector('#rightChoice').value = formatNames(results[rightChoice].name);
-      document.querySelector('#leftChoice').value = formatNames(results[leftChoice].name);
-    }
-
-    //make the names look nicer
-    function formatNames(name) {
-      //remove dashes
-      name = name.replaceAll("-", " ");
-
-      //capitalize the first letter of every word
-      console.log(name.split(" "));
-      let nameArray = name.split(" ");
-      name = "";
-      for (let i = 0; i < nameArray.length; i++) {
-        console.log(nameArray[i]);
-        nameArray[i] = nameArray[i][0].toUpperCase() + nameArray[i].slice(1);
-        name = name + " " + nameArray[i];
-      }
-      console.log(nameArray);
-
-      name = name[0].toUpperCase() + name.slice(1);
-
-      return name;
-    }
-
-    function dataLoadedImage(e) {
-      let obj = dataLoaded(e);
-
-      //if there is no obj, print a message and return
-      if (!obj) {
-        console.log("No image results found");
-        return; //Bail out
-      }
-
-      let results = obj;
-      console.log("Here are the results!");
-
-      return results.sprites.other.home.front_default;
-    }
-
-    //display the image for the left choice
-    function dataLoadedLeftImage(e) {
-      let imgSrc = dataLoadedImage(e);
-
-      document.querySelector('#leftImage').src = imgSrc;
-    }
-
-    //display the image for the right choice
-    function dataLoadedRightImage(e) {
-      let imgSrc = dataLoadedImage(e);
-
-      document.querySelector('#rightImage').src = imgSrc;
-    }
 
     //Handles our FETCH response.
     const handleResponse = async (response, parseResponse) => {
@@ -155,10 +29,10 @@
           console.log(`<b>Bad Request</b>`);
           break;
         case 404: //not real
-          console.log(content.innerHTML = `<b>Not Found</b>`);
+          console.log(`<b>Not Found</b>`);
           break;
         default: //any other status code
-          console.log(content.innerHTML = `Error code not implemented by client.`);
+          console.log(`Error code not implemented by client.`);
           break;
       }
 
@@ -166,6 +40,9 @@
       if (parseResponse) {
         switch (parseResponse) {
           case "getVotes":
+            //clear the content.innerHTML
+            content.innerHTML = "";
+
             //Parse the response to json. This is an async function, so we will await it.
             let obj = await response.json();
 
@@ -187,12 +64,16 @@
               content.innerHTML += `<p>Message: ${jsonString}</p>`;
             }
             break;
-          // case "getPokemon":
-          //   let pokemonObj = await response.json();
+          case "getPokemon":
+            let pokemonObj = await response.json();
 
-          //   console.log("pokemonObj: ");
-          //   console.log(pokemonObj);
-          //   break;
+            //put the names in the buttons
+            document.querySelector('#rightChoice').value = pokemonObj.pokemonData.rightName;
+            document.querySelector('#leftChoice').value = pokemonObj.pokemonData.leftName;
+            //add the images
+            document.querySelector('#rightImage').src = pokemonObj.pokemonData.rightImgSrc;
+            document.querySelector('#leftImage').src = pokemonObj.pokemonData.leftImgSrc;
+            break;
           default:
             console.log("something went wrong");
             break;
@@ -233,24 +114,20 @@
 
     //Uses fetch to send a getRequest asking the server for Pokemon data. 
     //Marksed as async because we use await within it.
-    //I thought the directions said I had to have my server use the external API but 
-    //then I couldn't figure out how to do xml with node
-    //but then I reread the directions and I think I was wrong about that
-    //but just incase I'm wrong I'm leaving this here.
-    // const getPokemon = async () => {
+    const getPokemon = async () => {
 
-    //   let response = await fetch("/getPokemon", {
-    //     method: "GET",
-    //     headers: {
-    //       'Content-Type': 'application/x-www-form-urlencoded',
-    //       'Accept': 'application/json',
-    //     },
-    //   });
+      let response = await fetch("/getPokemon", {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json',
+        },
+      });
 
-    //   //Once we have a response, handle it. The second parameter is a string
-    //   //that says how we should parse the response.
-    //   handleResponse(response, "getPokemon");
-    // };
+      //Once we have a response, handle it. The second parameter is a string
+      //that says how we should parse the response.
+      handleResponse(response, "getPokemon");
+    };
 
     //function to send request. This is marked as async since we will use await.
     const requestUpdate = async (getVotesForm) => {
@@ -274,9 +151,7 @@
 
     const randomizeChoices = () => {
       //randomly generate the two choices to vote for
-      getData("https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0", false);
-
-      //getPokemon();
+      getPokemon();
     }
 
     //Init function is called when window.onload runs (set below).
