@@ -1,3 +1,5 @@
+
+//some code here is based on my 430 assignment HTTP API Assignment 2 https://luke-sullivan-http-api-2-9aad542a9f75.herokuapp.com/
 const http = require('http');
 const url = require('url'); // url module
 const query = require('querystring'); // for parsing querystrings from url

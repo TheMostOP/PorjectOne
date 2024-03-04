@@ -10,32 +10,20 @@
     //some code here is based on my 235 project "Amiibo Shelf" https://people.rit.edu/lcs3087/235/project2/index.html
     //some code here is based on my 430 assignment HTTP API Assignment 2 https://luke-sullivan-http-api-2-9aad542a9f75.herokuapp.com/
     function getData(serviceUrl, isImageRequest = false, isRightImage = false) {
-      // 1 - main entry point to web service
+      // main entry point to web service
       const SERVICE_URL = serviceUrl;
 
       // No API Key required!
 
-      // 2 - build up our URL string
+      // build up our URL string
       // not necessary for this service endpoint
       let url = SERVICE_URL;
 
-      // 3 - parse the user entered term we wish to search
-      // not necessary for this service endpoint
-      // let term = document.querySelector("#searchterm").value.trim();
-      // term = encodeURIComponent(term);
-      // let type = document.querySelector("#searchType").value;
-      // url += type;
-      // url += "=";
-      // url += term;
-
-      // 4 - update the UI
-      document.querySelector("#content").innerHTML = `<b>Querying web service with:</b> <a href="${url}" target="_blank">${url}</a>`;
-
-      // 5 - create a new XHR object
+      // create a new XHR object
       let xhr = new XMLHttpRequest();
 
 
-      // 6 - set the onload handler
+      // set the onload handler
       if (isImageRequest) {
         if (isRightImage) {
           xhr.onload = dataLoadedRightImage;
@@ -48,10 +36,10 @@
         xhr.onload = dataLoadedNames;
       }
 
-      // 7 - set the onerror handler
+      // set the onerror handler
       xhr.onerror = dataError;
 
-      // 8 - open connection and send the request
+      // open connection and send the request
       xhr.open("GET", url);
       xhr.send();
     }
@@ -65,8 +53,6 @@
       let xhr = e.target;
 
       //xhr.responseText is the JSON file we just downloaded
-      // console.log("xhr.responseText");
-      // console.log(xhr.responseText);
 
       //turn the text into a parsable JavaScript object
       let obj = JSON.parse(xhr.responseText);
@@ -79,15 +65,12 @@
 
       //if there are no results, print a message and return
       if (!obj.results || obj.results.length == 0) {
-        document.querySelector("#content").innerHTML = "<b>No results found</b>";
-        //document.querySelector("#content").innerHTML = "";
+        console.log("No results found");
         return; //Bail out
       }
 
-      // 4 - if there is an array of results, loop through them
       results = obj.results;
-      //let bigString = "";
-      document.querySelector("#content").innerHTML = "<p><i>Here are the results!</i></p>";
+      console.log("Here are the results!");
       //randomly choose two pokemon
       let rightChoice = Math.floor(Math.random() * results.length);
       let leftChoice = Math.floor(Math.random() * results.length);
@@ -99,9 +82,6 @@
       //put the names in the buttons
       document.querySelector('#rightChoice').value = results[rightChoice].name;
       document.querySelector('#leftChoice').value = results[leftChoice].name;
-
-      // 5 - display final results to user
-      //document.querySelector("#content").innerHTML = bigString;
     }
 
     function dataLoadedImage(e) {
@@ -109,13 +89,12 @@
 
       //if there is no obj, print a message and return
       if (!obj) {
-        document.querySelector("#content").innerHTML = "<b>No results found</b>";
-        //document.querySelector("#content").innerHTML = "";
+        console.log("No image results found");
         return; //Bail out
       }
 
       let results = obj;
-      document.querySelector("#content").innerHTML = "<p><i>Here are the results!</i></p>";
+      console.log("Here are the results!");
 
       return results.sprites.other.home.front_default;
     }
@@ -164,34 +143,46 @@
 
       //If we should parse a response (meaning we made a get request)
       if (parseResponse) {
-        //Parse the response to json. This is an async function, so we will await it.
-        let obj = await response.json();
+        switch (parseResponse) {
+          case "getVotes":
+            //Parse the response to json. This is an async function, so we will await it.
+            let obj = await response.json();
 
-        //sort the returned data into an array
-        let objArray = Object.values(obj.votes);
-        objArray.sort((a, b) => { return b.points - a.points });
+            //sort the returned data into an array
+            let objArray = Object.values(obj.votes);
+            objArray.sort((a, b) => { return b.points - a.points });
 
-        //if the response is successful, display users
-        if (response.status == 200) {
-          //To display the data, we will loop through the votes and display them.
-          objArray.forEach(pokemon => {
-            content.innerHTML += `<p>${pokemon.name}: ${pokemon.points} votes</p>`;
-          });
+            //if the response is successful, display users
+            if (response.status == 200) {
+              //To display the data, we will loop through the votes and display them.
+              objArray.forEach(pokemon => {
+                content.innerHTML += `<p>${pokemon.name}: ${pokemon.points} votes</p>`;
+              });
+            }
+            //otherwise, display the error message
+            else {
+              //Again, to display the data easily, we will just stringify it again and display it.
+              let jsonString = JSON.stringify(obj.message);
+              content.innerHTML += `<p>Message: ${jsonString}</p>`;
+            }
+            break;
+          // case "getPokemon":
+          //   let pokemonObj = await response.json();
+
+          //   console.log("pokemonObj: ");
+          //   console.log(pokemonObj);
+          //   break;
+          default:
+            console.log("something went wrong");
+            break;
         }
-        //otherwise, display the error message
-        else {
-          //Again, to display the data easily, we will just stringify it again and display it.
-          // let jsonString = JSON.stringify(obj.message);
-          // content.innerHTML += `<p>Message: ${jsonString}</p>`;
-        }
-
 
       }
     };
 
-    //Uses fetch to send a postRequest. Marksed as async because we use await
-    //within it.
-    const sendPost = async (voteForm, choiceMade) => {
+    //Uses fetch to send a postRequest telling the server which Pokemon the user voted for. 
+    //Marksed as async because we use await within it.
+    const castVote = async (voteForm, choiceMade) => {
       //Grab all the info from the form
       const voteAction = voteForm.getAttribute('action');
       const voteMethod = voteForm.getAttribute('method');
@@ -219,6 +210,27 @@
       handleResponse(response, false);
     };
 
+    //Uses fetch to send a getRequest asking the server for Pokemon data. 
+    //Marksed as async because we use await within it.
+    //I thought the directions said I had to have my server use the external API but 
+    //then I couldn't figure out how to do xml with node
+    //but then I reread the directions and I think I was wrong about that
+    //but just incase I'm wrong I'm leaving this here.
+    // const getPokemon = async () => {
+
+    //   let response = await fetch("/getPokemon", {
+    //     method: "GET",
+    //     headers: {
+    //       'Content-Type': 'application/x-www-form-urlencoded',
+    //       'Accept': 'application/json',
+    //     },
+    //   });
+
+    //   //Once we have a response, handle it. The second parameter is a string
+    //   //that says how we should parse the response.
+    //   handleResponse(response, "getPokemon");
+    // };
+
     //function to send request. This is marked as async since we will use await.
     const requestUpdate = async (getVotesForm) => {
 
@@ -234,15 +246,16 @@
         },
       });
 
-      //Once we have our response, send it into handle response. The second parameter is a boolean
-      //that says if we should parse the response or not. We will get a response to parse on get
-      //requests so we can do an inline boolean check, which will return a true or false to pass in.
-      handleResponse(response, method === 'get');
+      //Once we have our response, send it into handle response. The second parameter is a string
+      //saying how we should parse the response
+      handleResponse(response, "getVotes");
     };
 
     const randomizeChoices = () => {
-      //randomly generate two numbers to be the two choices to vote for
+      //randomly generate the two choices to vote for
       getData("https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0", false);
+
+      //getPokemon();
     }
 
     //Init function is called when window.onload runs (set below).
@@ -269,7 +282,7 @@
       //calls our sendPost function above.
       const addVote = (e) => {
         e.preventDefault();
-        sendPost(voteForm, e.submitter.value);
+        castVote(voteForm, e.submitter.value);
         //re-randomize the choices after every vote
         randomizeChoices();
         return false;
